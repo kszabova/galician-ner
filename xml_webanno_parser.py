@@ -86,7 +86,7 @@ def assign_sentence_to_tag(tag_el, sentences):
     return (sentence_tuple[0], begin_new, end_new)
 
 
-def create_spacy_entities_from_tree(root, tags):
+def create_spacy_entities_from_tree(root, tags, allow_overlap=False):
     """
     Creates a list of tuples containing the sentence text and the entities within the sentence,
     as expected by the spaCy NER model.
@@ -104,7 +104,26 @@ def create_spacy_entities_from_tree(root, tags):
             sentence_entity = assign_sentence_to_tag(child, sentences)
             sentence_data = entities_map.setdefault(sentence_entity[0], [])
             sentence_data.append((sentence_entity[1], sentence_entity[2], child.tag))
+    if not allow_overlap:
+        remove_overlapping_entities(entities_map)
     return list(entities_map.items())
+
+
+def remove_overlapping_entities(entities_map):
+    """
+    Removes overlapping entities from the list of entities.
+
+    :param entities_map: A map of sentence - annotation pairs.
+
+    :return: A map of sentence - annotation pairs without overlapping entities.
+    """
+    for annotations in entities_map.values():
+        last_end = annotations[0][1]
+        for annotation in annotations[1:]:
+            if annotation[0] < last_end:
+                annotations.remove(annotation)
+            else:
+                last_end = annotation[1]
 
 
 def get_entities_for_spacy(files, tags):
