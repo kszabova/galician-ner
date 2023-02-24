@@ -116,7 +116,10 @@ def get_entities_for_spacy(files, tags):
     """
     entities = []
     for file in files:
-        root = parse_tree(file, remove_namespaces=True)
-        entities.extend(create_spacy_entities_from_tree(root, tags))
+        try:
+            root = parse_tree(file, remove_namespaces=True)
+            entities.extend(create_spacy_entities_from_tree(root, tags))
+        except:
+            print(f"Error parsing file: {file}. Skipping.")
     return entities
 
