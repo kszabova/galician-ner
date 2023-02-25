@@ -4,6 +4,9 @@ This module provides functionality to parse XML files in WebAnno format.
 
 import xml.etree.ElementTree as ET
 
+import spacy
+from spacy.training import offsets_to_biluo_tags, biluo_to_iob
+
 
 def parse_tree(file, remove_namespaces=False):
     """
@@ -85,6 +88,19 @@ def assign_sentence_to_tag(tag_el, sentences):
     end_new = int(end) - int(sentence_tuple[1])
     return (sentence_tuple[0], begin_new, end_new)
 
+def label_sentence_IOB(sentence, entities, nlp):
+    """
+    Labels the sentence with the IOB tags.
+
+    :param sentence: The sentence to be labeled.
+    :param entities: A list of tuples containing the begin index and the end index of the entity within the sentence.
+
+    :return: A list of tuples containing the sentence and the IOB labels.
+    """
+    doc = nlp(sentence)
+    tags = biluo_to_iob(offsets_to_biluo_tags(doc, entities))
+    return tags
+
 
 def create_spacy_entities_from_tree(root, tags, allow_overlap=False):
     """
@@ -141,4 +157,11 @@ def get_entities_for_spacy(files, tags):
         except:
             print(f"Error parsing file: {file}. Skipping.")
     return entities
+
+def get_entities_for_transformers(files, tags, nlp):
+    entities = get_entities_for_spacy(files, tags)
+    entities_transformers = []
+    for data in entities:
+        entities_transformers.append((data[0], label_sentence_IOB(data[0], data[1], nlp)))
+    return entities_transformers
 
