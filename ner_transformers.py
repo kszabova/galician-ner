@@ -63,7 +63,7 @@ def get_collate_fn(tokenizer, labels_to_ids):
 
 
 def prepare_data(data_dir, tags):
-    nlp = spacy.blank("en")
+    nlp = spacy.blank("xx")
     files = get_files_in_directory(data_dir)
     data = get_entities_for_transformers(files, tags, nlp)
 
@@ -126,7 +126,7 @@ def run_model(train, demo, data_dir, tags):
         train_model(trainer)
     if demo:
         saved_model = BertForTokenClassification.from_pretrained("transformer_model")
-        nlp = spacy.blank("en")
+        nlp = spacy.blank("xx")
         with open("labels.json", "r") as f:
             label_mapping = json.load(f)
             ids_to_labels = label_mapping["ids_to_labels"]
