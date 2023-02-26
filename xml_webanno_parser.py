@@ -88,6 +88,7 @@ def assign_sentence_to_tag(tag_el, sentences):
     end_new = int(end) - int(sentence_tuple[1])
     return (sentence_tuple[0], begin_new, end_new)
 
+
 def label_sentence_IOB(sentence, entities, nlp):
     """
     Labels the sentence with the IOB tags.
@@ -158,10 +159,14 @@ def get_entities_for_spacy(files, tags):
             print(f"Error parsing file: {file}. Skipping.")
     return entities
 
+
 def get_entities_for_transformers(files, tags, nlp):
     entities = get_entities_for_spacy(files, tags)
     entities_transformers = []
     for data in entities:
-        entities_transformers.append((data[0], label_sentence_IOB(data[0], data[1], nlp)))
+        tokens = [tok.text for tok in nlp.tokenizer(data[0])]
+        entities_transformers.append(
+            (tokens, label_sentence_IOB(data[0], data[1], nlp))
+        )
     return entities_transformers
 
