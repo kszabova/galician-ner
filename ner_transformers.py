@@ -145,6 +145,8 @@ def run_model(train, demo, data_dir, tags):
             ids_to_labels = label_mapping["ids_to_labels"]
         while True:
             text = input("Enter text (or 'exit' to quit):\n")
+            if text == "exit":
+                break
             tokens = [tok.text for tok in nlp.tokenizer(text)]
             tokenized = tokenizer(
                 tokens,

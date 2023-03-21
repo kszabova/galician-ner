@@ -3,3 +3,5 @@ data/
 *.spacy
 output/
 __pycache__/
+labels.json
+transformer_model/

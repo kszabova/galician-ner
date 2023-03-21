@@ -62,32 +62,3 @@ def get_entities_for_transformers(files, tags, nlp):
             (tokens, label_sentence_IOB(data[0], data[1], nlp))
         )
     return entities_transformers
-
-
-# from util import get_files_in_directory
-
-# files = get_files_in_directory(
-#     "/Users/kristina/Documents/school/upv/building_language_resources/project/data/galician"
-# )
-# get_entities_for_spacy(files, None)
-# counter = 0
-# for file in files:
-#     with open_web_anno_tsv(file) as f:
-#         try:
-#             for sentence in f:
-#                 pass
-#         except:
-#             print(f"Error in file {file}")
-#             counter += 0
-# print(counter)
-
-with open_web_anno_tsv("/Users/kristina/Downloads/ES100947_belen.tsv") as f:
-    f_iter = iter(f)
-    while True:
-        try:
-            print(next(f_iter))
-        except StopIteration:
-            break
-        except Exception as e:
-            print(e)
-            continue
