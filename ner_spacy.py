@@ -7,7 +7,7 @@ import spacy
 from thinc.api import Config
 from spacy.tokens import DocBin
 from spacy.cli.train import train
-from xml_webanno_parser import get_entities_for_spacy
+from tsv_webanno_parser import get_entities_for_spacy
 from util import get_files_in_directory, split_train_test
 
 
@@ -48,9 +48,7 @@ def train_ner_spacy(config_file, output_path, create_data=False, *, data_dir=Non
         lang = config["nlp"]["lang"]
         nlp = spacy.blank(lang)
         files = get_files_in_directory(data_dir)
-        data = get_entities_for_spacy(
-            files, ["BODYPART", "CLINENTITY"]
-        )  # TODO make this configurable
+        data = get_entities_for_spacy(files, None)  # TODO make this configurable
         train_data, test_data = split_train_test(
             data, random_seed=config["training"]["seed"]
         )

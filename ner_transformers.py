@@ -12,8 +12,25 @@ from transformers import (
 )
 from datasets import Dataset
 
-from xml_webanno_parser import get_entities_for_transformers
+from tsv_webanno_parser import get_entities_for_transformers
 from util import get_files_in_directory, split_train_test
+
+tags = [
+    "*",
+    "Cell or Molecular Dysfunction",
+    "Mental or Behavioral Dysfunction",
+    "Signs or Symptoms",
+    "Sign or Symptom",
+    "Neoplastic Process",
+    "Acquired Abnormality",
+    "Injury or Poisoning",
+    "Anatomical Abnormality",
+    "Pathologic Function",
+    "Congenital Abnormality",
+    "Finding",
+    "Disease or Syndrome",
+]
+tags_iob = ["O"] + [f"B-{tag}" for tag in tags] + [f"I-{tag}" for tag in tags]
 
 
 def compute_metrics(eval_pred):
@@ -25,12 +42,8 @@ def compute_metrics(eval_pred):
 
 
 def map_labels_and_ids(df):
-    unique_labels = set()
-    for labels in df["tags"].values.tolist():
-        for label in labels:
-            unique_labels.add(label)
-    labels_to_ids = {label: i for i, label in enumerate(unique_labels)}
-    ids_to_labels = {i: label for i, label in enumerate(unique_labels)}
+    labels_to_ids = {label: i for i, label in enumerate(tags_iob)}
+    ids_to_labels = {i: label for i, label in enumerate(tags_iob)}
     return labels_to_ids, ids_to_labels
 
 
@@ -85,7 +98,7 @@ def dataframe_to_dataset(df, tokenizer, labels_to_ids):
 
 def prepare_trainer(train, test, tags):
     model = BertForTokenClassification.from_pretrained(
-        "bert-base-multilingual-cased", num_labels=len(tags) * 2 + 1
+        "bert-base-multilingual-cased", num_labels=len(tags_iob)
     )
 
     training_args = TrainingArguments(
@@ -147,7 +160,7 @@ def run_model(train, demo, data_dir, tags):
                 if word_id is None or word_id == previous_word_id:
                     continue
                 else:
-                    labels.append(ids_to_labels[label.item()])
+                    labels.append(ids_to_labels[str(label.item())])
                     previous_word_id = word_id
             print(*zip(tokens, labels), sep="\n")
 
