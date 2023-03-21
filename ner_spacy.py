@@ -25,6 +25,9 @@ def create_spacy_data(data, nlp, output_file):
         ents = []
         for start, end, label in annotations:
             span = doc.char_span(start, end, label=label)
+            if span is None:
+                print("Skipping entity")
+                continue
             ents.append(span)
         doc.ents = ents
         db.add(doc)

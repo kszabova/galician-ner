@@ -57,7 +57,7 @@ def create_labels_for_tokenized_input(input, labels, tokenizer, labels_to_ids):
         if word_id is None or word_id == word_ids[i - 1]:
             new_labels.append(-100)
         else:
-            new_labels.append(labels_to_ids[labels[word_id]])
+            new_labels.append(labels_to_ids.get(labels[word_id], labels_to_ids["O"]))
     return tokenized, new_labels
 
 
@@ -117,12 +117,12 @@ def prepare_trainer(train, test, tags):
     return trainer
 
 
-def train_model(trainer):
+def train_model(trainer, model_dir):
     trainer.train()
-    trainer.save_model("transformer_model")
+    trainer.save_model(model_dir)
 
 
-def run_model(train, demo, data_dir, tags):
+def run_model(train, demo, data_dir, tags, model_dir):
     tokenizer = BertTokenizerFast.from_pretrained("bert-base-multilingual-cased")
     if train:
         df_train, df_test = prepare_data(data_dir, tags)
@@ -136,9 +136,9 @@ def run_model(train, demo, data_dir, tags):
         train_dataset = dataframe_to_dataset(df_train, tokenizer, labels_to_ids)
         test_dataset = dataframe_to_dataset(df_test, tokenizer, labels_to_ids)
         trainer = prepare_trainer(train_dataset, test_dataset, tags)
-        train_model(trainer)
+        train_model(trainer, model_dir)
     if demo:
-        saved_model = BertForTokenClassification.from_pretrained("transformer_model")
+        saved_model = BertForTokenClassification.from_pretrained(model_dir)
         nlp = spacy.blank("xx")
         with open("labels.json", "r") as f:
             label_mapping = json.load(f)
