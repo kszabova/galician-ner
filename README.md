@@ -36,7 +36,7 @@ python main.py spacy --train --demo --data_dir="./data/galician" --spacy_config=
 To train the system by fine-tuning a pre-trained BERT model, run:
 
 ```
-python main.py spacy \
+python main.py transformer \
      --train \                                  # if you want to train the system
      --demo \                                   # if you want to test the trained system on your data
      --data_dir=<data_dir> \                    # the directory containing the training data; only necessary if --train is specified
