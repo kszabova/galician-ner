@@ -46,12 +46,15 @@ def main():
             if not args.spacy_model:
                 raise ValueError("Please provide a spaCy model directory.")
             train_ner_spacy(
-                "spacy_config.cfg", "output", create_data=True, data_dir=args.data_dir
+                "spacy_config.cfg",
+                args.spacy_model,
+                create_data=True,
+                data_dir=args.data_dir,
             )
         if args.demo:
             if not args.spacy_model:
                 raise ValueError("Please provide a spaCy model directory.")
-            demo_spacy("output/model-best")
+            demo_spacy(f"{args.spacy_model}/model-best")
     elif args.model_type == "transformer":
         if args.train and not args.data_dir:
             raise ValueError("Please provide a data directory.")
