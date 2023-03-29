@@ -3,6 +3,8 @@ import numpy as np
 import spacy
 import evaluate
 import json
+import torch
+import sys
 
 from transformers import (
     BertTokenizerFast,
@@ -34,11 +36,28 @@ tags_iob = ["O"] + [f"B-{tag}" for tag in tags] + [f"I-{tag}" for tag in tags]
 
 
 def compute_metrics(eval_pred):
-    # TODO this is not working
+    np.set_printoptions(threshold=sys.maxsize)
     logits, labels = eval_pred
-    predictions = np.argmax(logits, axis=-1)
+    labels = labels.flatten()
+    predictions = np.argmax(logits, axis=-1).flatten()
+
+    # only take into account the positions whose gold labels are not -100
+    labels_selected = labels[labels != -100]
+    predictions_selected = predictions[labels != -100]
+
     accuracy = evaluate.load("accuracy")
-    return accuracy.compute(predictions=predictions, references=labels)
+    f1 = evaluate.load("f1")
+
+    accuracy_results = accuracy.compute(
+        predictions=predictions_selected, references=labels_selected
+    )
+    f1_results = f1.compute(
+        predictions=predictions_selected, references=labels_selected, average="micro"
+    )
+    return {
+        "accuracy": accuracy_results,
+        "f1": f1_results,
+    }
 
 
 def map_labels_and_ids(df):
@@ -111,7 +130,7 @@ def prepare_trainer(train, test, tags):
         args=training_args,
         train_dataset=train,
         eval_dataset=test,
-        # compute_metrics=compute_metrics,
+        compute_metrics=compute_metrics,
     )
 
     return trainer
