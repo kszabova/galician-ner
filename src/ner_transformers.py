@@ -3,7 +3,6 @@ import numpy as np
 import spacy
 import evaluate
 import json
-import torch
 import sys
 
 from transformers import (
